@@ -21,5 +21,26 @@ jobs:
           test -f .github/PULL_REQUEST_TEMPLATE.md
       - name: Public-safety smoke check
         run: |
-          ! grep -R "ghp_\|github_pat_\|KUMA_[A-Z0-9_]*_PUSH_URL=https://" \
-            README.md SPEC.md AGENTS.md CHANGELOG.md CONTRIBUTING.md SECURITY.md .github
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          token_markers = ['gh' + 'p_', 'github' + '_pat_']
+          push_url = re.compile(r'KUMA_[A-Z0-9_]*_PUSH_URL=https://')
+          files = [
+              Path('README.md'),
+              Path('SPEC.md'),
+              Path('AGENTS.md'),
+              Path('CHANGELOG.md'),
+              Path('CONTRIBUTING.md'),
+              Path('SECURITY.md'),
+              Path('.github/PULL_REQUEST_TEMPLATE.md'),
+          ]
+          failures = []
+          for path in files:
+              text = path.read_text(encoding='utf-8')
+              if any(marker in text for marker in token_markers) or push_url.search(text):
+                  failures.append(str(path))
+          if failures:
+              raise SystemExit('public-safety markers found in: ' + ', '.join(failures))
+          PY

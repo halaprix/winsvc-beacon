@@ -58,4 +58,4 @@ WinSvcBeacon is not trying to beat full observability platforms. Its wedge is a 
 
 ## Status
 
-v0.1.0-alpha.0 — scaffold/spec only.
+v0.1.0-alpha.1 — scaffold/spec only; CI smoke check fixed.
